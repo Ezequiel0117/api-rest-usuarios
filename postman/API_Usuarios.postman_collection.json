@@ -1,0 +1,112 @@
+{
+  "info": {
+    "name": "API REST Usuarios (Node + Express + PostgreSQL)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "usuarioId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1. Registrar usuario (POST)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201 Created', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "if (json.usuario) pm.collectionVariables.set('usuarioId', json.usuario.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"María\",\n  \"apellido\": \"Gómez\",\n  \"email\": \"maria.gomez@correo.com\",\n  \"password\": \"secreto123\",\n  \"telefono\": \"0991112233\"\n}"
+        },
+        "url": "{{baseUrl}}/usuarios"
+      }
+    },
+    {
+      "name": "2. Consultar usuarios (GET)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200 OK', () => pm.response.to.have.status(200));"] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/usuarios" }
+    },
+    {
+      "name": "3. Consultar usuario por ID (GET)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200 OK', () => pm.response.to.have.status(200));"] } }],
+      "request": { "method": "GET", "url": "{{baseUrl}}/usuarios/{{usuarioId}}" }
+    },
+    {
+      "name": "4. Actualizar usuario (PUT)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200 OK', () => pm.response.to.have.status(200));"] } }],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"María José\",\n  \"telefono\": \"0995556677\"\n}" },
+        "url": "{{baseUrl}}/usuarios/{{usuarioId}}"
+      }
+    },
+    {
+      "name": "5. Eliminar usuario (DELETE)",
+      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 200 OK', () => pm.response.to.have.status(200));"] } }],
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/usuarios/{{usuarioId}}" }
+    },
+    {
+      "name": "Errores",
+      "item": [
+        {
+          "name": "POST con datos inválidos (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 400', () => pm.response.to.have.status(400));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"A\",\n  \"email\": \"correo-invalido\",\n  \"password\": \"123\"\n}" },
+            "url": "{{baseUrl}}/usuarios"
+          }
+        },
+        {
+          "name": "POST con email duplicado (409)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 409', () => pm.response.to.have.status(409));"] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Torres\",\n  \"email\": \"ana.torres@correo.com\",\n  \"password\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/usuarios"
+          }
+        },
+        {
+          "name": "GET usuario inexistente (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 404', () => pm.response.to.have.status(404));"] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/usuarios/99999" }
+        },
+        {
+          "name": "GET con ID inválido (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 400', () => pm.response.to.have.status(400));"] } }],
+          "request": { "method": "GET", "url": "{{baseUrl}}/usuarios/abc" }
+        },
+        {
+          "name": "PUT sin campos (400)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 400', () => pm.response.to.have.status(400));"] } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/usuarios/1"
+          }
+        },
+        {
+          "name": "DELETE usuario inexistente (404)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('Status 404', () => pm.response.to.have.status(404));"] } }],
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/usuarios/99999" }
+        }
+      ]
+    }
+  ]
+}
